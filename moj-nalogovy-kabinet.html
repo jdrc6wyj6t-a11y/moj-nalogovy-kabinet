@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1769e0">
+<title>Мой налоговый кабинет</title>
+<style>
+:root{--blue:#1769e0;--ink:#182230;--muted:#718096;--bg:#f3f6fb;--line:#e7edf5;--green:#159b62}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:linear-gradient(135deg,#1769e0,#3989f5);color:white;padding:22px 18px 28px;border-radius:0 0 26px 26px}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:14px;opacity:.95}.brand{font-size:22px;font-weight:750;margin:22px 0 5px}.sub{opacity:.85;font-size:14px}
+main{padding:0 15px 100px;margin-top:-12px}.card{background:white;border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 5px 18px #172b4d0b}
+.balance{display:flex;justify-content:space-between;align-items:center}.label{color:var(--muted);font-size:13px}.amount{font-size:30px;font-weight:800;margin:6px 0}.pill{font-size:12px;background:#e7f7ef;color:#11804f;padding:7px 10px;border-radius:20px}
+h2{font-size:18px;margin:20px 3px 10px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tile{background:white;border-radius:16px;padding:16px 13px;min-height:106px;box-shadow:0 4px 15px #172b4d08}.ico{font-size:22px}.tile b{display:block;margin-top:10px}.tile small{color:var(--muted)}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}.row:last-child{border:0}
+button{border:0;border-radius:12px;background:var(--blue);color:white;padding:12px 15px;font-weight:650;font-size:14px}
+button.secondary{background:#edf3ff;color:var(--blue)}button.danger{background:#fff0f0;color:#c03939}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+nav{position:fixed;bottom:0;left:0;right:0;background:#ffffffed;backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:10px 4px calc(10px + env(safe-area-inset-bottom));z-index:5}
+nav button{background:transparent;color:#68778b;padding:7px 10px;min-width:65px}nav button.active{color:var(--blue);background:#edf3ff}
+input,textarea,select{width:100%;border:1px solid #dce4ef;border-radius:11px;padding:12px;font:inherit;margin:6px 0 12px;background:white;color:var(--ink)}
+label{font-size:13px;color:var(--muted)}.hidden{display:none}.muted{color:var(--muted)}.empty{padding:20px;text-align:center;color:var(--muted)}
+.modal{position:fixed;inset:0;background:#10182877;display:none;align-items:flex-end;z-index:10}.modal.show{display:flex}.sheet{background:white;border-radius:22px 22px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom));width:100%;max-height:88vh;overflow:auto}.sheet h3{margin:0 0 15px}.close{float:right;background:#eef2f7;color:#344054}
+.notice{font-size:12px;line-height:1.45;color:#65758b;background:#eef4ff;border-radius:12px;padding:12px;margin-top:16px}
+</style>
+</head>
+<body>
+<header>
+ <div class="top"><span>ЛИЧНЫЙ КАБИНЕТ</span><span id="today"></span></div>
+ <div class="brand">Мой налоговый кабинет</div>
+ <div class="sub">Личный учёт налогов и документов</div>
+</header>
+<main>
+<section id="home">
+ <div class="card">
+  <div class="balance"><div><div class="label">Общий баланс</div><div class="amount" id="balance">0 ₽</div><div class="label">Ваши данные в этом кабинете</div></div><span class="pill">● Личный учёт</span></div>
+  <div class="actions"><button onclick="openModal('balanceModal')">Изменить баланс</button><button class="secondary" onclick="showPage('taxes')">Мои налоги</button></div>
+ </div>
+ <h2>Разделы кабинета</h2>
+ <div class="grid">
+  <div class="tile" onclick="showPage('taxes')"><span class="ico">🧾</span><b>Налоги</b><small id="taxCount">0 записей</small></div>
+  <div class="tile" onclick="showPage('debts')"><span class="ico">⚠️</span><b>Задолженности</b><small id="debtCount">0 записей</small></div>
+  <div class="tile" onclick="showPage('payments')"><span class="ico">💳</span><b>Платежи</b><small id="payCount">0 записей</small></div>
+  <div class="tile" onclick="showPage('docs')"><span class="ico">📁</span><b>Документы</b><small id="docCount">0 файлов</small></div>
+ </div>
+ <div class="card"><h2 style="margin:0 0 8px">Быстрые действия</h2><div class="actions"><button onclick="addRecord('taxes')">＋ Добавить налог</button><button class="secondary" onclick="addRecord('docs')">＋ Добавить документ</button></div></div>
+ <div class="notice">Это личный демонстрационный органайзер. Он не подключён к ФНС, не проверяет реальные задолженности и не принимает платежи. Не вводите паспортные данные, пароли или банковские реквизиты.</div>
+</section>
+<section id="taxes" class="hidden"><h2>Мои налоги</h2><div class="card" id="taxList"></div><button onclick="addRecord('taxes')">＋ Добавить налог</button></section>
+<section id="debts" class="hidden"><h2>Задолженности</h2><div class="card" id="debtList"></div><button onclick="addRecord('debts')">＋ Добавить задолженность</button></section>
+<section id="payments" class="hidden"><h2>Платежи</h2><div class="card" id="paymentList"></div><button onclick="addRecord('payments')">＋ Добавить платёж</button></section>
+<section id="docs" class="hidden"><h2>Документы</h2><div class="card" id="docList"></div><button onclick="addRecord('docs')">＋ Добавить документ</button></section>
+<section id="profile" class="hidden"><h2>Настройки</h2><div class="card"><label>Имя в кабинете</label><input id="profileName" placeholder="Например, Иван"><button onclick="saveName()">Сохранить имя</button><div class="notice">Данные хранятся локально в браузере на этом устройстве. При очистке данных Safari они могут удалиться.</div><div class="actions"><button class="secondary" onclick="exportData()">Экспортировать резервную копию</button><button class="danger" onclick="resetData()">Очистить все данные</button></div></div></section>
+</main>
+<nav>
+ <button class="active" data-page="home" onclick="showPage('home')">⌂<br>Главная</button>
+ <button data-page="taxes" onclick="showPage('taxes')">▤<br>Налоги</button>
+ <button data-page="payments" onclick="showPage('payments')">₽<br>Платежи</button>
+ <button data-page="profile" onclick="showPage('profile')">⚙<br>Ещё</button>
+</nav>
+<div class="modal" id="recordModal"><div class="sheet"><button class="close" onclick="closeModal()">Закрыть</button><h3 id="modalTitle">Новая запись</h3><form id="recordForm"><label>Название</label><input id="rTitle" required placeholder="Например, Транспортный налог"><label>Сумма (₽), если применимо</label><input id="rAmount" type="number" min="0" step="0.01" placeholder="0"><label>Дата</label><input id="rDate" type="date"><label>Статус / примечание</label><textarea id="rNote" rows="3" placeholder="Например, оплачено или срок до 1 декабря"></textarea><button type="submit">Сохранить запись</button></form></div></div>
+<div class="modal" id="balanceModal"><div class="sheet"><button class="close" onclick="closeModal()">Закрыть</button><h3>Изменить баланс</h3><label>Сумма (₽)</label><input id="balanceInput" type="number" step="0.01"><button onclick="saveBalance()">Сохранить</button></div></div>
+<script>
+const keys=['taxes','debts','payments','docs'];
+let data=JSON.parse(localStorage.getItem('taxCabinetData')||'{"balance":0,"name":"","taxes":[],"debts":[],"payments":[],"docs":[]}');
+let currentType='taxes';
+const titles={taxes:'Новый налог',debts:'Новая задолженность',payments:'Новый платёж',docs:'Новый документ'};
+function persist(){localStorage.setItem('taxCabinetData',JSON.stringify(data));render()}
+function money(n){return new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2}).format(Number(n)||0)+' ₽'}
+function showPage(p){document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));document.getElementById(p).classList.remove('hidden');document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));render()}
+function openModal(id){document.getElementById(id).classList.add('show')}
+function closeModal(){document.querySelectorAll('.modal').forEach(m=>m.classList.remove('show'))}
+function addRecord(type){currentType=type;document.getElementById('modalTitle').textContent=titles[type];document.getElementById('recordForm').reset();document.getElementById('rDate').value=new Date().toISOString().slice(0,10);openModal('recordModal')}
+document.getElementById('recordForm').addEventListener('submit',e=>{e.preventDefault();data[currentType].push({id:Date.now(),title:rTitle.value,amount:Number(rAmount.value)||0,date:rDate.value,note:rNote.value});persist();closeModal()});
+function removeRecord(type,id){if(confirm('Удалить эту запись?')){data[type]=data[type].filter(x=>x.id!==id);persist()}}
+function list(type,id){let el=document.getElementById(id);el.innerHTML='';if(!data[type].length){el.innerHTML='<div class="empty">Пока нет записей. Нажмите «Добавить».</div>';return}data[type].forEach(x=>{let d=document.createElement('div');d.className='row';let left=document.createElement('div');let b=document.createElement('b');b.textContent=x.title;let small=document.createElement('div');small.className='muted';small.style.fontSize='12px';small.textContent=[x.date,x.note].filter(Boolean).join(' · ');left.append(b,small);let right=document.createElement('div');right.style.textAlign='right';let amount=document.createElement('b');amount.textContent=x.amount?money(x.amount):'';let del=document.createElement('button');del.className='danger';del.style.padding='6px 9px';del.style.marginTop='5px';del.textContent='Удалить';del.onclick=()=>removeRecord(type,x.id);right.append(amount,document.createElement('br'),del);d.append(left,right);el.append(d)})}
+function render(){document.getElementById('balance').textContent=money(data.balance);document.getElementById('taxCount').textContent=data.taxes.length+' записей';document.getElementById('debtCount').textContent=data.debts.length+' записей';document.getElementById('payCount').textContent=data.payments.length+' записей';document.getElementById('docCount').textContent=data.docs.length+' записей';list('taxes','taxList');list('debts','debtList');list('payments','paymentList');list('docs','docList');document.getElementById('profileName').value=data.name||''}
+function saveBalance(){data.balance=Number(document.getElementById('balanceInput').value)||0;persist();closeModal()}
+function saveName(){data.name=document.getElementById('profileName').value;persist();alert('Имя сохранено')}
+function exportData(){let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='moj-nalogovy-kabinet-backup.json';a.click();URL.revokeObjectURL(a.href)}
+function resetData(){if(confirm('Точно удалить все записи? Это действие нельзя отменить.')){data={balance:0,name:'',taxes:[],debts:[],payments:[],docs:[]};persist()}}
+document.getElementById('today').textContent=new Date().toLocaleDateString('ru-RU');render();
+</script>
+</body></html>
